@@ -12,16 +12,13 @@ LOG_SQL = True
 engine = create_engine(
     SQLALCHEMY_DATABASE_URI,
     echo=LOG_SQL,
-    future=True, # SQLAlchemy 2.0 compatibility
-    pool_pre_ping=True
+    future=True,  # SQLAlchemy 2.0 compatibility
+    pool_pre_ping=True,
 )
 
 
 SessionLocal = sessionmaker(
-    autocommit=False,
-    autoflush=False,
-    bind=engine,
-    expire_on_commit=False
+    autocommit=False, autoflush=False, bind=engine, expire_on_commit=False
 )
 
 """
@@ -30,13 +27,13 @@ SQLAlchemy connection count provided for testing and debugging purposes.
 connection_count = 0
 
 
-@event.listens_for(engine, 'checkin')
+@event.listens_for(engine, "checkin")
 def receive_checkin(dbapi_connection, connection_record):
     global connection_count
     connection_count -= 1
 
 
-@event.listens_for(engine, 'checkout')
+@event.listens_for(engine, "checkout")
 def receive_checkout(dbapi_connection, connection_record, connection_proxy):
     global connection_count
     connection_count += 1
@@ -72,8 +69,8 @@ class Container(containers.DeclarativeContainer):
     config = providers.Configuration()
 
     # Do not use this with the Closing directive
-    db = providers.Factory( SessionLocal )
+    db = providers.Factory(SessionLocal)
 
     # For use with Closing.
     # Use only with scoped_session thread-local scope.
-    closed_db = providers.Resource( get_closed_db )
+    closed_db = providers.Resource(get_closed_db)
