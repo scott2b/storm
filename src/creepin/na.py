@@ -1,0 +1,4 @@
+
+
+def na():
+    return False
