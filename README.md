@@ -22,3 +22,9 @@ Run tests with coverage:
 ```
 tox
 ```
+
+
+## Connectivity configuration
+
+Database URI formats are documented in the [SQLAlchemy Engine configuration docs](
+https://docs.sqlalchemy.org/en/14/core/engines.html)

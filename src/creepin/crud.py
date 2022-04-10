@@ -14,10 +14,10 @@ from typing import Type, TypeVar, Union
 from sqlalchemy.orm import Session, declarative_base
 from sqlalchemy import exc
 from sqlalchemy.orm.decl_api import DeclarativeMeta
-from dependency_injector.wiring import Provide, Closing
+from dependency_injector.wiring import inject, Provide, Closing
 import pydantic
 
-from .db import Container
+from .wiring import Container
 
 # from .db import SessionLocal
 
@@ -78,6 +78,7 @@ class DataModel(ModelExceptions):
         _d = self.data_model(model=model)
         return _d.json()
 
+    @inject
     def save(self, *, db: Session = Closing[Provide[Container.closed_db]]):
         """Update the data in the database."""
         if not hasattr(self, "id") or not self.id:
@@ -97,8 +98,6 @@ class ModelTypeInterface(Protocol[ModelTypeVar]):
 
 
 ModelType = TypeVar("ModelType", bound=ModelTypeInterface)
-
-
 CreateSchemaType = TypeVar("CreateSchemaType", bound=pydantic.BaseModel)
 UpdateSchemaType = TypeVar("UpdateSchemaType", bound=pydantic.BaseModel)
 
@@ -115,12 +114,14 @@ class CRUDManager(Generic[ModelType]):
         """
         self.model = model
 
+    @inject
     def get(
         self, id: Any, *, db: Session = Closing[Provide[Container.closed_db]]
     ) -> Optional[ModelType]:
         """Get an instance of ModelType by id."""
         return db.query(self.model).filter(self.model.id == id).first()
 
+    @inject
     def fetch(
         self,
         *,
@@ -135,12 +136,14 @@ class CRUDManager(Generic[ModelType]):
         """
         return db.query(self.model).offset(skip).limit(limit).all()
 
+    @inject
     def query(
         self, *, db: Session = Closing[Provide[Container.closed_db]]
     ) -> List[ModelType]:
         """Get a query of this model type"""
         return db.query(self.model)
 
+    @inject
     def create(
         self, properties, db: Session = Closing[Provide[Container.closed_db]]
     ) -> ModelType:
@@ -153,6 +156,7 @@ class CRUDManager(Generic[ModelType]):
             raise self.model.Exists from e
         return obj
 
+    @inject
     def delete(
         self, *, id: int, db: Session = Closing[Provide[Container.closed_db]]
     ) -> ModelType:
