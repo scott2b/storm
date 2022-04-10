@@ -5,7 +5,8 @@ from sqlalchemy.orm import sessionmaker
 from dependency_injector import containers, providers
 
 
-SQLALCHEMY_DATABASE_URI = "sqlite+pysqlite:///test.db"
+#SQLALCHEMY_DATABASE_URI = "sqlite+pysqlite:///test.db"
+SQLALCHEMY_DATABASE_URI = "sqlite+pysqlite:///:memory:"
 LOG_SQL = True
 
 

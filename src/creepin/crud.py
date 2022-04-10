@@ -32,11 +32,16 @@ class Exists(Exception):
     """Object already exists."""
 
 
+class InvalidState(Exception):
+    """Object state prevents the attempted operation."""
+
+
 class ModelExceptions:
     """Exceptions mixin for models."""
 
     DoesNotExist = DoesNotExist
     Exists = Exists
+    InvalidState = InvalidState
 
 
 class DefaultSchema(pydantic.BaseModel):
@@ -76,7 +81,7 @@ class DataModel(ModelExceptions):
     def save(self, *, db: Session = Closing[Provide[Container.closed_db]]):
         """Update the data in the database."""
         if not hasattr(self, "id") or not self.id:
-            raise Exception("Unable to save model without id")
+            raise InvalidState("Unable to save model without id")
         db.add(self)
         db.commit()
         return self
