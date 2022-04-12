@@ -1,16 +1,14 @@
-#from .db import Container
 from dependency_injector import containers, providers
-#from . import crud
 
 
 Container = containers.DynamicContainer()
 
-def wire(_db):
-    global Container
-    Container.db = providers.Factory(_db.Session)
-    Container.closed_db = providers.Resource(_db.get_closed_db)
-    #Container.wire(modules=modules)
-    #Container.wire(modules=["creepin.crud"] + modules)
+#def wire(_db):
+#    global Container
+#    Container.db = providers.Factory(_db.Session)
+#    Container.closed_db = providers.Resource(_db.get_closed_db)
+#    #Container.wire(modules=modules)
+#    #Container.wire(modules=["creepin.crud"] + modules)
 
 
 #DEFAULT_MODULES = [crud]

@@ -13,13 +13,13 @@ from typing import Any, Dict, Generic, List, Optional, Protocol
 from typing import Type, TypeVar, Union
 from sqlalchemy.orm import Session, declarative_base
 from sqlalchemy import exc
+from sqlalchemy import Column, Integer
 from sqlalchemy.orm.decl_api import DeclarativeMeta
 from dependency_injector.wiring import inject, Provide, Closing
 import pydantic
 
 from .wiring import Container
 
-# from .db import SessionLocal
 
 ModelBase = declarative_base()
 
@@ -55,10 +55,12 @@ class DefaultSchema(pydantic.BaseModel):
         extra = "allow"
 
 
+@dataclasses.dataclass
 class DataModel(ModelExceptions):
     """Subclasses should be @dataclass annotated."""
 
     default_schema = DefaultSchema
+    id:int = Column(Integer, primary_key=True)
 
     def data_model(self, model=None):
         """Get the data of this instance, constructed as the specified model."""
@@ -81,10 +83,14 @@ class DataModel(ModelExceptions):
     @inject
     def save(self, *, db: Session = Closing[Provide[Container.closed_db]]):
         """Update the data in the database."""
-        if not hasattr(self, "id") or not self.id:
-            raise InvalidState("Unable to save model without id")
-        db.add(self)
-        db.commit()
+        #if not hasattr(self, "id") or not self.id:
+        #    raise InvalidState("Unable to save model without id")
+        try:
+            db.add(self)
+            db.commit()
+        except:
+            db.rollback()
+            raise
         return self
 
 

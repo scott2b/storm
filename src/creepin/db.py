@@ -1,9 +1,11 @@
 import os
 from typing import Generator
+from dependency_injector import containers, providers
 from sqlalchemy import create_engine
 from sqlalchemy import event
 from sqlalchemy.orm import sessionmaker
 #from dependency_injector import containers, providers
+from .wiring import Container
 
 
 #from . import crud
@@ -14,7 +16,7 @@ class InvalidDatabaseConfiguration(Exception):
 
 
 
-class DB():
+class AlchemyDB():
 
     def __init__(self, db_uri, verbose=False):
         self.db_uri = db_uri
@@ -31,6 +33,15 @@ class DB():
         )
         event.listen(self.engine, "checkin", self.receive_checkin)
         event.listen(self.engine, "checkout", self.receive_checkout)
+
+    @property
+    def container(self):
+        return Container
+
+    def register(_db):
+        Container.db = providers.Factory(_db.Session)
+        Container.closed_db = providers.Resource(_db.get_closed_db)
+
 
     #def wire(self, modules=None):
     #    if modules is None:
@@ -54,9 +65,9 @@ class DB():
         def myfunc(db:Session=Closing[Provide[Container.closed_db]])...
         ```
 
-        WARNING: The yielded session object cannot be error-handled in this scope.  Thus,
-        rollback and connection close will not occur as a result of exceptions in target
-        functions.
+        !!! WARNING: The yielded session object cannot be error-handled in this scope.
+        Thus, rollback and connection close will not occur as a result of exceptions in
+        target functions.
 
         This service **should only be used with thread-local scope** and with the Closing
         dependency injection directive. Requires expire_on_commit=False so that objects
