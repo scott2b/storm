@@ -5,10 +5,10 @@ Base connectivity and CRUD for SQLAlchemy ORMs
 
 ## Development
 
-Install tox:
+Install dependencies:
 
 ```
-pip install tox
+pip install -r requirements-dev.txt
 ```
 
 If using pyenv and a virtualenv, set the local pyenvs. E.g.:
