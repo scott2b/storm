@@ -73,7 +73,7 @@ class DataModel(ModelExceptions):
     def dict(self, model=None):
         """Return the validated data as a dictionary."""
         _d = self.data_model(model=model)
-        return _d.dict()
+        return _d.model_dump()
 
     def json(self, model=None):
         """Return the validated data as a JSON string."""
